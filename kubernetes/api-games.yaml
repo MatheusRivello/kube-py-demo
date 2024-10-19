@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: api-games
+  name: app-games
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: app-games
+      type: database
+  template:
+    metadata:
+      labels:
+        app: app-games
+        type: database
+    spec:
+      containers:
+      - name: flask-api-games
+        image: matheusrivello/flask-games-api:1.0
+        ports:
+        - containerPort: 5000    
+        readinessProbe:
+          httpGet:
+            path: /heltz
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /heltz
+            port: 5000
+          initialDelaySeconds: 60
+          periodSeconds: 20
+          failureThreshold: 6            
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "512M"
+            cpu: "500m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: api-games
+  name: app-games-svc
+spec:
+  selector:
+    app: app-games
+    type: database
+  ports:
+    - port: 5000
+      targetPort: 5000
+  type: LoadBalancer

@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: api-games
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+      type: database
+  serviceName: postgres-svc
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: postgres
+        type: database
+    spec:
+      containers:
+      - name: postgres
+        image: cgr.dev/chainguard/postgres:latest
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "512M"
+            cpu: "1000m"
+        ports:
+          - containerPort: 5432
+        env:
+          - name: POSTGRES_USER
+            valueFrom:
+              secretKeyRef:
+                key: POSTGRES_USER
+                name: postgres-secret
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: POSTGRES_PASSWORD
+                name: postgres-secret
+          - name: POSTGRES_DB
+            valueFrom:
+              secretKeyRef:
+                key: POSTGRES_DB
+                name: postgres-secret
+          - name: POSTGRES_HOST
+            valueFrom:
+              secretKeyRef:
+                key: POSTGRES_HOST
+                name: postgres-secret
+        readinessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - postgres
+          initialDelaySeconds: 20
+          periodSeconds: 10
+        livenessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - postgres
+          initialDelaySeconds: 60
+          periodSeconds: 20
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: api-games
+  name: postgres-svc
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+  - port: 5432
+    targetPort: 5432
+  selector:
+    app: postgres
+    type: database
+
