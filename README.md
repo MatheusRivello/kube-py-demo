@@ -17,7 +17,7 @@ Adicionar no arquivo `/etc/hosts ` a entrada` appgames.demo.com` para o IP do lo
     curl http://appgames.demo.com/games
 
 ## Próximos Passos
-Implementar build automático da imagem da aplicação com GitHub Actions
-Utilizar ConfigMap para otimizar o arquivo de configuração do Postgres
-Configurar Volumes para garantir persistência dos dados
-Criar um CronJob para realizar backups da base de dados
+- Implementar build automático da imagem da aplicação com GitHub Actions
+- Utilizar ConfigMap para otimizar o arquivo de configuração do Postgres
+- Configurar Volumes para garantir persistência dos dados
+- Criar um CronJob para realizar backups da base de dados
