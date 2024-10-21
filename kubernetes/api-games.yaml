@@ -20,6 +20,27 @@ spec:
         image: matheusrivello/flask-games-api:1.0
         ports:
         - containerPort: 5000    
+        env:
+          - name: POSTGRES_USER
+            valueFrom:
+              secretKeyRef:
+                key: POSTGRES_USER
+                name: postgres-secret
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: POSTGRES_PASSWORD
+                name: postgres-secret
+          - name: POSTGRES_DB
+            valueFrom:
+              secretKeyRef:
+                key: POSTGRES_DB
+                name: postgres-secret
+          - name: POSTGRES_HOST
+            valueFrom:
+              secretKeyRef:
+                key: POSTGRES_HOST
+                name: postgres-secret        
         readinessProbe:
           httpGet:
             path: /heltz
@@ -53,6 +74,6 @@ spec:
     app: app-games
     type: database
   ports:
-    - port: 5000
+    - port: 80
       targetPort: 5000
   type: LoadBalancer
